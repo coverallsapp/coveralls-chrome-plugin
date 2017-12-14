@@ -2,8 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title></title>
+  <title>Coveralls Plugin</title>
 </head>
 <body>
+  <div>
+    <label for="overlay">Enable coverage overlay</label>
+    <input type="checkbox" id="overlay">
+  </div>
+  <br>
+
+  <div>
+    <label>What is the URL for your git client?</label>
+    <input type="text" id="git-url">
+  </div>
+  <br>
+
+  <button id="save">Save Changes</button>
+  <span id="status"></span>
+
+  <script src="options.js"></script>
 </body>
 </html>
