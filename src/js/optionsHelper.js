@@ -9,25 +9,23 @@ export default class OptionsHelper {
   }
 
   getOptions(callback) {
-    chrome.storage.sync.get('options', (options) => {
-      this.options = options;
+    chrome.storage.sync.get('options', (optionsReturned) => {
+      const options = optionsReturned.options || {};
       let save = false;
 
       Object.keys(this.defaultOptions).forEach((key) => {
-        if (this.optionsKey === undefined) {
+        if (options[key] === undefined) {
           save = true;
-          this.options[key] = this.defaultOptions[key];
+          options[key] = this.defaultOptions[key];
         }
       });
 
       callback(options);
-      if (save) this.saveOptions(this.options);
+      if (save) this.saveOptions(options);
     });
   }
 
   saveOptions(options, callback) {
-    this.options = options;
-
     chrome.storage.sync.set({ options }, callback);
   }
 };

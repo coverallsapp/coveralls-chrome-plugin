@@ -2,6 +2,7 @@ import OptionsHelper from './optionsHelper';
 
 function setupOptions(optionsHelper) {
   optionsHelper.getOptions((options) => {
+    console.log(options);
     document.getElementById('overlay-enabled').checked = options.overlayEnabled;
     document.getElementById('git-url').value = options.gitUrl;
     document.getElementById('coveralls-url').value = options.coverallsUrl;
