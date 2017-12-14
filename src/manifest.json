@@ -5,5 +5,8 @@
   },
   "browser_action": {
   },
-  "manifest_version": 2
+  "manifest_version": 2,
+  "permissions": [
+    "storage"
+  ]
 }

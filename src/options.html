@@ -6,20 +6,30 @@
 </head>
 <body>
   <div>
-    <label for="overlay">Enable coverage overlay</label>
-    <input type="checkbox" id="overlay">
+    <label for="overlay-enabled">Enable coverage overlay</label>
+    <input type="checkbox" id="overlay-enabled">
   </div>
   <br>
 
   <div>
-    <label>What is the URL for your git client?</label>
+    <label>GitHub URL:</label>
     <input type="text" id="git-url">
+  </div>
+  <br>
+
+  <div>
+    <label>Coveralls URL:</label>
+    <input type="text" id="coveralls-url">
+  </div>
+  <br>
+
+  <div>
+    <label>API Token:</label>
+    <input type="text" id="api-token">
   </div>
   <br>
 
   <button id="save">Save Changes</button>
   <span id="status"></span>
-
-  <script src="options.js"></script>
 </body>
 </html>
