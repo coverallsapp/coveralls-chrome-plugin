@@ -5,8 +5,22 @@
   },
   "browser_action": {
   },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "all_frames": true,
+      "run_at": "document_end",
+      "js": [
+        "coveralls.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    "coveralls.js"
+  ],
   "manifest_version": 2,
   "permissions": [
+    "<all_urls>",
     "storage"
   ]
 }

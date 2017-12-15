@@ -1,6 +1,6 @@
-import OptionsHelper from './optionsHelper';
+import optionsHelper from './optionsHelper';
 
-function setupOptions(optionsHelper) {
+function setupOptions() {
   optionsHelper.getOptions((options) => {
     console.log(options);
     document.getElementById('overlay-enabled').checked = options.overlayEnabled;
@@ -10,7 +10,7 @@ function setupOptions(optionsHelper) {
   });
 }
 
-function saveOptions(optionsHelper) {
+function saveOptions() {
   const options = {
     gitUrl: document.getElementById('git-url').value,
     overlayEnabled: document.getElementById('overlay-enabled').checked,
@@ -27,8 +27,6 @@ function saveOptions(optionsHelper) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const optionsHelper = new OptionsHelper();
-
-  setupOptions(optionsHelper);
-  document.getElementById('save').addEventListener('click', () => saveOptions(optionsHelper));
+  setupOptions();
+  document.getElementById('save').addEventListener('click', () => saveOptions());
 });
