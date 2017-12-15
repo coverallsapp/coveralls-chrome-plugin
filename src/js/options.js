@@ -1,16 +1,14 @@
 import optionsHelper from './optionsHelper';
 
-function setupOptions() {
-  optionsHelper.getOptions((options) => {
-    console.log(options);
-    document.getElementById('overlay-enabled').checked = options.overlayEnabled;
-    document.getElementById('git-url').value = options.gitUrl;
-    document.getElementById('coveralls-url').value = options.coverallsUrl;
-    document.getElementById('api-token').value = options.apiToken;
-  });
+async function setupOptions() {
+  const options = await optionsHelper.getOptions();
+  document.getElementById('overlay-enabled').checked = options.overlayEnabled;
+  document.getElementById('git-url').value = options.gitUrl;
+  document.getElementById('coveralls-url').value = options.coverallsUrl;
+  document.getElementById('api-token').value = options.apiToken;
 }
 
-function saveOptions() {
+async function saveOptions() {
   const options = {
     gitUrl: document.getElementById('git-url').value,
     overlayEnabled: document.getElementById('overlay-enabled').checked,
@@ -18,12 +16,11 @@ function saveOptions() {
     apiToken: document.getElementById('api-token').value,
   };
 
-  optionsHelper.saveOptions(options, () => {
-    const status = document.getElementById('status');
-    status.textContent = 'Options saved.';
+  await optionsHelper.saveOptions(options);
+  const status = document.getElementById('status');
+  status.textContent = 'Options saved.';
 
-    setTimeout(() => { status.textContent = ''; }, 1000);
-  });
+  setTimeout(() => { status.textContent = ''; }, 1000);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

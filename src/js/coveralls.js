@@ -1,22 +1,23 @@
-import optionsHelper from './optionsHelper';
 import * as $ from 'jquery';
+import optionsHelper from './optionsHelper';
+import coverageHelper from './coverageHelper';
 
 function shouldLoadOverlay(options) {
   if (options.overlayEnabled && document.location.hostname === options.gitUrl) {
     return true;
-  } else {
-    return false;
   }
+
+  return false;
 }
 
-function loadOverlay() {
-  console.log('here');
+function loadOverlay(options) {
+  coverageHelper.apiCoverageGrab(options);
 }
 
 $(() => {
-  optionsHelper.getOptions((options) => {
+  optionsHelper.getOptions().then((options) => {
     if (shouldLoadOverlay(options)) {
-      loadOverlay();
+      loadOverlay(options);
     }
   });
 });

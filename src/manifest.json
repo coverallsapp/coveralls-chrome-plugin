@@ -3,6 +3,9 @@
     "page": "options.html",
     "chrome_style": true
   },
+  "background": {
+    "scripts": ["background.js"]
+  },
   "browser_action": {
   },
   "content_scripts": [

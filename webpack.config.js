@@ -9,6 +9,7 @@ const options = {
   entry: {
     options: path.join(__dirname, 'src', 'js', 'options.js'),
     coveralls: path.join(__dirname, 'src', 'js', 'coveralls.js'),
+    background: path.join(__dirname, 'src', 'js', 'background.js'),
   },
   output: {
     path: path.join(__dirname, 'dist'),
