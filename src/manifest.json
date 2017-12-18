@@ -14,12 +14,12 @@
       "all_frames": true,
       "run_at": "document_end",
       "js": [
-        "coveralls.js"
+        "overlay.js"
       ]
     }
   ],
   "web_accessible_resources": [
-    "coveralls.js"
+    "overlay.js"
   ],
   "manifest_version": 2,
   "permissions": [
