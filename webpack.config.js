@@ -8,7 +8,7 @@ const fileExtensions = ['jpg', 'jpeg', 'png', 'gif', 'eot', 'otf', 'svg', 'ttf',
 const options = {
   entry: {
     options: path.join(__dirname, 'src', 'js', 'options.js'),
-    coveralls: path.join(__dirname, 'src', 'js', 'coveralls.js'),
+    overlay: path.join(__dirname, 'src', 'js', 'overlay.js'),
     background: path.join(__dirname, 'src', 'js', 'background.js'),
   },
   output: {

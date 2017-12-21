@@ -1,9 +1,8 @@
-import * as axios from "axios";
+import * as axios from 'axios';
 
 function githubApiCoverageUrl(pathName, options) {
   const pathArray = pathName.replace(/^\//, '').split('/');
   const baseUrl = `http://${options.coverallsUrl}/github/${pathArray[0]}/${pathArray[1]}`;
-  console.log(pathArray);
   if (pathArray.length === 2) {
     return `${baseUrl}.json?branch=master`;
   } else if (pathArray.length === 4) {
@@ -35,7 +34,6 @@ const apiCoverageGrab = async (options, pathname) => {
       headers: { Authentication: `token ${options.api_token}` },
     });
 
-    console.log(response);
   }
 };
 

@@ -2,23 +2,32 @@ import browser from 'webextension-polyfill';
 
 import optionsHelper from './optionsHelper';
 import coverageHelper from './coverageHelper';
+import CoverallsCache from './coveralls';
 
-function shouldLoadOverlay(options, changeInfo, tab) {
-  if (options.overlayEnabled && changeInfo.status === 'loading' && tab.url.split('/')[2] === options.gitUrl) {
-    return true;
-  }
+const pageListener = (port) => {
+  const tabId = port.sender.tab.id;
+  let currentUrl = port.sender.url;
 
-  return false;
-}
+  browser.tabs.onUpdated.addListener(async (updatedTabId, changeInfo, tab) => {
+    if (updatedTabId === tabId && tab.url !== currentUrl && changeInfo.status === 'complete') {
+      currentUrl = tab.url;
+    }
 
-function loadOverlay(options, url) {
-  coverageHelper.apiCoverageGrab(options, url.split('/').splice(3).join('/'));
-}
+    port.postMessage('getCommitSha');
+  });
 
-browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  const options = await optionsHelper.getOptions();
+  let currentSha = null;
+  let currentCache = null;
 
-  if (shouldLoadOverlay(options, changeInfo, tab)) {
-    loadOverlay(options, tab.url);
-  }
-});
+  port.onMessage.addListener((message) => {
+    if (message && message.sha && message.sha !== currentSha) {
+      currentSha = message.sha;
+      currentCache = new CoverallsCache(currentSha);
+
+      port.postMessage('sendFilesForLoading');
+    }
+  });
+};
+
+browser.runtime.onConnect.addListener(pageListener);
+

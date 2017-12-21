@@ -7,7 +7,7 @@ export default class Coveralls {
     this.commitSha = commitSha;
     optionsHelper.getOptions().then((options) => {
       this.$http = axios.create({
-        baseURL: `${options.coverallsUrl}/builds/${this.commitSha}`,
+        baseURL: `${options.coverallsUrl}/builds`,
         headers: { Authentication: `token ${options.apiToken}` },
       });
 
@@ -17,7 +17,7 @@ export default class Coveralls {
 
   async getFile(filepath) {
     if (!this.commitObj.files[filepath]) {
-      this.commitObj.files[filepath] = await this.$http.get('/source.json', {
+      this.commitObj.files[filepath] = await this.$http.get(`${this.commitSha}/source.json`, {
         params: { filename: filepath },
       });
       this._cacheCommitObj();
@@ -28,7 +28,7 @@ export default class Coveralls {
 
   async getPath(path) {
     if (!this.commitObj.paths[path]) {
-      this.commitObj.paths[path] = await this.$http.get('.json', {
+      this.commitObj.paths[path] = await this.$http.get(`${this.commitSha}.json`, {
         params: { paths: path },
       });
       this._cacheCommitObj();
@@ -40,8 +40,8 @@ export default class Coveralls {
   async _getSavedBuild() {
     this.commitObj = await browser.storage.local.get(this.commitSha);
 
-    if (!this.commitObj) {
-      this.commitObj = await this.$http.get('.json');
+    if (!Object.keys(this.commitObj).length) {
+      this.commitObj = await this.$http.get(`${this.commitSha}.json`);
       this.commitObj.files = {};
       this.commitObj.paths = {};
       this._cacheCommitObj();
@@ -50,6 +50,7 @@ export default class Coveralls {
 
   async _cacheCommitObj() {
     const cacheObj = {};
+    console.log(this.commitObj);
     cacheObj[this.commitSha] = this.commitObj;
 
     return browser.storage.local.set(cacheObj);
