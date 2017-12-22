@@ -17,9 +17,10 @@ export default class Coveralls {
 
   async getFile(filepath) {
     if (!this.commitObj.files[filepath]) {
-      this.commitObj.files[filepath] = await this.$http.get(`${this.commitSha}/source.json`, {
+      const result = await this.$http.get(`${this.commitSha}/source.json`, {
         params: { filename: filepath },
       });
+      this.commitObj.files[filepath] = result.data;
       this._cacheCommitObj();
     }
 
@@ -28,9 +29,10 @@ export default class Coveralls {
 
   async getPath(path) {
     if (!this.commitObj.paths[path]) {
-      this.commitObj.paths[path] = await this.$http.get(`${this.commitSha}.json`, {
+      const result =  await this.$http.get(`${this.commitSha}.json`, {
         params: { paths: path },
       });
+      this.commitObj.paths[path] = result.data;
       this._cacheCommitObj();
     }
 
@@ -39,9 +41,11 @@ export default class Coveralls {
 
   async _getSavedBuild() {
     this.commitObj = await browser.storage.local.get(this.commitSha);
+    console.log(this.commitObj);
 
     if (!Object.keys(this.commitObj).length) {
-      this.commitObj = await this.$http.get(`${this.commitSha}.json`);
+      const result = await this.$http.get(`${this.commitSha}.json`);
+      this.commitObj = result.data;
       this.commitObj.files = {};
       this.commitObj.paths = {};
       this._cacheCommitObj();
