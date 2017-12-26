@@ -37,6 +37,8 @@ function filesAndPathsForLoading() {
       files: [$('.breadcrumb')[0].innerText.split('/').splice(1).join('/')],
     };
   }
+
+  return {};
 }
 
 
@@ -51,6 +53,7 @@ optionsHelper.getOptions().then((options) => {
           break;
         case 'sendFilesForLoading':
           connection.postMessage(filesAndPathsForLoading());
+          break;
         default:
           break;
       }
