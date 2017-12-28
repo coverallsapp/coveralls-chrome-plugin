@@ -31,19 +31,22 @@ const pageListener = async (port) => {
     port.postMessage('sendFilesForLoading');
   };
 
-  const processFileRequest = async (file) => {
-    const coverage = currentCache.getFile(file);
-    port.postMessage({ file, coverage });
+  const processFileRequest = (file) => {
+    currentCache.getFile(file).then((coverage) => {
+      port.postMessage({ file, coverage });
+    });
   };
 
-  const processPathRequest = async (path) => {
-    const coverage = currentCache.getFile(path);
-    port.postMessage({ path, coverage });
+  const processPathRequest = (path) => {
+    currentCache.getFile(path).then((coverage) => {
+      port.postMessage({ path, coverage });
+    });
   };
 
 
   // Message handler, identify message type call correct function defined above
   const messageHandler = (message) => {
+    console.log(message);
     if (message && message.sha && message.sha !== currentSha) {
       processInitialCommitLoad(message);
     }
