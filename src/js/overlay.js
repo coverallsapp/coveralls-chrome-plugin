@@ -53,20 +53,25 @@ function filesAndPathsForLoading() {
 }
 
 optionsHelper.getOptions().then((options) => {
-  if (options.overlayEnabled && window.location.hostname === options.gitUrl) {
-    const connection = browser.runtime.connect();
+  function setup() {
+    if (options.overlayEnabled && window.location.hostname === options.gitUrl) {
+      const connection = browser.runtime.connect();
 
-    connection.onMessage.addListener((message) => {
-      console.log(message);
-      if (message === 'getCommitSha') {
-        connection.postMessage({ sha: getSha() });
-      } else if (message === 'sendFilesForLoading') {
-        connection.postMessage(filesAndPathsForLoading());
-      } else if (message.file) {
-        loadFileCoverage(message.file, message.coverage)
-      }
-    });
+      connection.onMessage.addListener((message) => {
+        console.log(message);
+        if (message === 'getCommitSha') {
+          connection.postMessage({ sha: getSha() });
+        } else if (message === 'sendFilesForLoading') {
+          connection.postMessage(filesAndPathsForLoading());
+        } else if (message.file) {
+          loadFileCoverage(message.file, message.coverage)
+        }
+      });
+    }
   }
+
+  setup();
+  document.addEventListener('pjax:success', setup);
 
 });
 
