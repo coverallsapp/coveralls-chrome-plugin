@@ -7,6 +7,8 @@ const defaultOptions = {
   apiToken: '',
 };
 
+const saveOptions = (options) => browser.storage.sync.set({ options });
+
 const getOptions = async () => {
   const optionsReturned = await browser.storage.sync.get('options');
   const options = optionsReturned.options || {};
@@ -19,12 +21,11 @@ const getOptions = async () => {
     }
   });
 
-  if (save) this.saveOptions(options);
+  if (save) saveOptions(options);
 
   return options;
 };
 
-const saveOptions = (options) => browser.storage.sync.set({ options });
 
 export default {
   defaultOptions,

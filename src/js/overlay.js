@@ -2,24 +2,34 @@ import browser from 'webextension-polyfill';
 import * as $ from 'jquery';
 
 import optionsHelper from './optionsHelper';
+import '../css/badges.css';
 
 function getSha() {
   return $('.commit-tease-sha') ? $('.commit-tease-sha').attr('href').split('/').pop() : null;
 }
 
 function loadFileCoverage(filepath, coverage) {
-  coverage.forEach((value, index) => {
-    const line = $(`#LC${index + 1}`);
-    if (value > 0) {
-      line.css('background-color', 'rgba(208, 233, 153, 0.2)');
-    } else if (value === 0) {
-      line.css('background-color', 'rgba(216, 134, 123, 0.2)');
-    }
-  });
+  const path = window.location.pathname.split('/');
+
+  if (path.length === 2) { // master branch file list
+  } else if (path[3] === 'tree') { // Showing a folder view
+  } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
+  } else if (['blob', 'blame'].includes(path[3])) { // View has contents of a full file
+    coverage.forEach((value, index) => {
+      const line = $(`#LC${index + 1}`);
+      if (value > 0) {
+        line.css('background-color', 'rgba(208, 233, 153, 0.2)');
+      } else if (value === 0) {
+        line.css('background-color', 'rgba(216, 134, 123, 0.2)');
+        line.append('<span class="coveralls-uncov-badge"></span>"');
+      }
+    });
+  }
 }
 
 function filesAndPathsForLoading() {
   const path = window.location.pathname.split('/');
+  console.log(path);
 
   if (path.length === 2) { // master branch file list
     return { paths: ['/*'] };
@@ -35,6 +45,7 @@ function filesAndPathsForLoading() {
       files: filenames,
     };
   } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
+    debugger;
     const filenames = [];
     $('.file-info .link-gray-dark').each(function addToFileNames() {
       filenames.push(this.innerText);
@@ -53,7 +64,7 @@ function filesAndPathsForLoading() {
 }
 
 optionsHelper.getOptions().then((options) => {
-  function setup() {
+  function processPage() {
     if (options.overlayEnabled && window.location.hostname === options.gitUrl) {
       const connection = browser.runtime.connect();
 
@@ -70,8 +81,7 @@ optionsHelper.getOptions().then((options) => {
     }
   }
 
-  setup();
-  document.addEventListener('pjax:success', setup);
-
+  processPage();
+  document.addEventListener('pjax:success', processPage);
 });
 
