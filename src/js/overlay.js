@@ -5,7 +5,7 @@ import optionsHelper from './optionsHelper';
 import '../css/badges.css';
 
 function getSha() {
-  return $('.commit-tease-sha') ? $('.commit-tease-sha').attr('href').split('/').pop() : null;
+  return $('.commit-tease-sha').length ? $('.commit-tease-sha').attr('href').split('/').pop() : null;
 }
 
 function loadFileCoverage(filepath, coverage) {
@@ -34,15 +34,19 @@ function filesAndPathsForLoading() {
   if (path.length === 2) { // master branch file list
     return { paths: ['/*'] };
   } else if (path[3] === 'tree') { // Showing a folder view
-    const filenames = [];
     const directory = $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
-    $('.content .js-navigation-open').each(function addToFilenames() {
-      filenames.push(`${directory}${this.outerText}`);
+    const paths = [`${directory}*`];
+
+    $('tr.js-navigation-item').each(function addToFilenames() {
+      if ($(this).find('.icon .octicon-file-directory').length) {
+        paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}/*`);
+      } else if ($(this).find('.icon .octicon-file-text').length) {
+        paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}`);
+      }
     });
 
     return {
-      paths: [`${directory}*`],
-      files: filenames,
+      paths,
     };
   } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
     debugger;
@@ -75,7 +79,7 @@ optionsHelper.getOptions().then((options) => {
         } else if (message === 'sendFilesForLoading') {
           connection.postMessage(filesAndPathsForLoading());
         } else if (message.file) {
-          loadFileCoverage(message.file, message.coverage)
+          loadFileCoverage(message.file, message.coverage);
         }
       });
     }
