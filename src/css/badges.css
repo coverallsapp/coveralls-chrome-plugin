@@ -1,18 +1,33 @@
-.coveralls-uncov-badge {
+.coveralls-text-badge {
   font-size: 0.75em;
   font-weight: bold;
   line-height: 20px;
   text-align: center;
   display: inline;
-  color: #fff;
-  background-color: #b94947;
+  color: white;
   width: 40px;
   position: absolute;
   right: 0;
 }
 
-.coveralls-uncov-badge::before {
-  content: 'uncov';
+.coveralls-text-badge::before {
+  content: attr(data-badge-text);
+}
+
+.coveralls-uncov {
+  background-color: rgba(216, 134, 123, 0.2);
+}
+
+.coveralls-cov {
+  background-color: rgba(208, 233, 153, 0.2);
+}
+
+.coveralls-uncov-darker {
+  background-color: rgba(185, 73, 71, 0.7);
+}
+
+.coveralls-cov-darker {
+  background-color: rgba(95, 151, 68, 0.7);
 }
 
 .coveralls-percent-badge {

@@ -18,11 +18,15 @@ function loadFileCoverage(filepath, coverage) {
   } else if (['blob', 'blame'].includes(path[3])) { // View has contents of a full file
     coverage.forEach((value, index) => {
       const line = $(`#LC${index + 1}`);
+      const lineNum = $(`#L${index + 1}`);
       if (value > 0) {
-        line.css('background-color', 'rgba(208, 233, 153, 0.2)');
+        line.addClass('coveralls-cov');
+        lineNum.addClass('coveralls-cov');
+        line.append(`<span class="coveralls-text-badge coveralls-cov-darker" data-badge-text="${value}X"></span>`);
       } else if (value === 0) {
-        line.css('background-color', 'rgba(216, 134, 123, 0.2)');
-        line.append('<span class="coveralls-uncov-badge"></span>"');
+        line.addClass('coveralls-uncov');
+        lineNum.addClass('coveralls-uncov');
+        line.append('<span class="coveralls-text-badge coveralls-uncov-darker" data-badge-text="uncov"></span>');
       }
     });
   }
