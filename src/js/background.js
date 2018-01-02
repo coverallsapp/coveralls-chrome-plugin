@@ -26,7 +26,7 @@ const pageListener = async (port) => {
   };
 
   const processPathRequest = (path) => {
-    currentCache.getFile(path).then((coverage) => {
+    currentCache.getPath(path).then((coverage) => {
       port.postMessage({ path, coverage });
     });
   };

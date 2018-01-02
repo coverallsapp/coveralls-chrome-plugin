@@ -5,13 +5,11 @@ import optionsHelper from './optionsHelper';
 export default class Coveralls {
   constructor(commitSha) {
     this.commitSha = commitSha;
-    optionsHelper.getOptions().then(async (options) => {
+    optionsHelper.getOptions().then((options) => {
       this.$http = axios.create({
         baseURL: `${options.coverallsUrl}/builds`,
         headers: { Authentication: `token ${options.apiToken}` },
       });
-
-      await this._getSavedBuild();
     });
   }
 
@@ -32,6 +30,10 @@ export default class Coveralls {
   }
 
   async getPath(path) {
+    if (!this.commitObj) {
+      await this._getSavedBuild();
+    }
+
     if (!this.commitObj.paths[path]) {
       const result =  await this.$http.get(`${this.commitSha}.json`, {
         params: { paths: path },

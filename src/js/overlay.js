@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 
 import optionsHelper from './optionsHelper';
 import '../css/badges.css';
@@ -27,14 +28,27 @@ function loadFileCoverage(filepath, coverage) {
   }
 }
 
+function loadPathCoverage(path, coverage) {
+  const urlPath = window.location.pathname.split('/');
+  const directory = urlPath.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
+  const textForRow = path.replace('/*', '').replace(directory, '');
+
+  if (textForRow === '*') {
+    $('.commit-tease .message').append(`<img class="coveralls-percent-badge" 
+                                             style="position: absolute" 
+                                             src="${coverage.badge_url}">`);
+  } else {
+    $(`tr.js-navigation-item:contains(${textForRow})`).each(function addCoverageInformation() {
+      $(this).find('td:last').prepend(`<img class="coveralls-percent-badge" src="${coverage.badge_url}">`);
+    });
+  }
+}
+
 function filesAndPathsForLoading() {
   const path = window.location.pathname.split('/');
-  console.log(path);
 
-  if (path.length === 2) { // master branch file list
-    return { paths: ['/*'] };
-  } else if (path[3] === 'tree') { // Showing a folder view
-    const directory = $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
+  if (path.length === 3 || path[3] === 'tree') { // Showing a folder view
+    const directory = path.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
     const paths = [`${directory}*`];
 
     $('tr.js-navigation-item').each(function addToFilenames() {
@@ -49,7 +63,6 @@ function filesAndPathsForLoading() {
       paths,
     };
   } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
-    debugger;
     const filenames = [];
     $('.file-info .link-gray-dark').each(function addToFileNames() {
       filenames.push(this.innerText);
@@ -80,6 +93,8 @@ optionsHelper.getOptions().then((options) => {
           connection.postMessage(filesAndPathsForLoading());
         } else if (message.file) {
           loadFileCoverage(message.file, message.coverage);
+        } else if (message.path && _.get(message.coverage, 'paths_covered_percent')) {
+          loadPathCoverage(message.path, message.coverage);
         }
       });
     }
