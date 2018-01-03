@@ -1,9 +1,9 @@
 // @flow
 import * as $ from 'jquery';
-import IOverlay from './OverlayInterface';
+import type { IOverlay } from './OverlayInterface';
 
 export default class GitHubOverlay implements IOverlay {
-  sha: string
+  sha: ?string
   constructor() {
     this.sha = this._getSha();
   }
@@ -44,7 +44,7 @@ export default class GitHubOverlay implements IOverlay {
     return null;
   }
 
-  applyFileCoverage(filepath, coverage) {
+  applyFileCoverage(filepath: string, coverage: Array<number>) {
     const path = window.location.pathname.split('/');
 
     if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
@@ -82,7 +82,7 @@ export default class GitHubOverlay implements IOverlay {
     }
   }
 
-  applyPathCoverage(path, coverage) {
+  applyPathCoverage(path: string, coverage: Object) {
     const urlPath = window.location.pathname.split('/');
     const directory = urlPath.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
     const textForRow = path.replace('/*', '').replace(directory, '');
@@ -98,8 +98,8 @@ export default class GitHubOverlay implements IOverlay {
     }
   }
 
-  _getSha() {
-    let sha = null;
+  _getSha(): ?string {
+    let sha: ?string;
     if ($('.commit-tease-sha').length) {
       sha = $('.commit-tease-sha').attr('href').split('/').pop();
     } else if ($('.sha.user-select-contain')) {
