@@ -1,4 +1,4 @@
-import optionsHelper from './optionsHelper';
+import optionsHelper from './helpers/optionsHelper';
 
 async function setupOptions() {
   const options = await optionsHelper.getOptions();

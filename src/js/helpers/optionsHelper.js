@@ -5,6 +5,7 @@ const defaultOptions = {
   gitUrl: 'github.com',
   coverallsUrl: 'coveralls.io',
   apiToken: '',
+  gitClient: 'github',
 };
 
 const saveOptions = (options) => browser.storage.sync.set({ options });

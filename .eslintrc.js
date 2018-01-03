@@ -1,5 +1,12 @@
 module.exports = {
-  'extends': 'airbnb-base',
+  'extends': [
+    'airbnb-base',
+    'plugin:flowtype/recommended',
+  ],
+  parser: 'babel-eslint',
+  plugins:[
+    'flowtype',
+  ],
   rules: {
     'arrow-parens': ['error', 'always'],
     'no-param-reassign': 'off',

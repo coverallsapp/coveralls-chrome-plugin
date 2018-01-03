@@ -1,7 +1,7 @@
 import browser from 'webextension-polyfill';
 
-import optionsHelper from './optionsHelper';
-import CoverallsCache from './coveralls';
+import optionsHelper from './helpers/optionsHelper';
+import CoverallsCache from './services/CoverallsCache';
 
 const pageListener = async (port) => {
   let currentSha = null;

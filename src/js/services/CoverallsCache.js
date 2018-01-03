@@ -1,8 +1,8 @@
 import * as axios from 'axios';
 import browser from 'webextension-polyfill';
-import optionsHelper from './optionsHelper';
+import optionsHelper from '../helpers/optionsHelper';
 
-export default class Coveralls {
+export default class CoverallsCache {
   constructor(commitSha) {
     this.commitSha = commitSha;
     optionsHelper.getOptions().then((options) => {

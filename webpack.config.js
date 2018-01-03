@@ -18,6 +18,11 @@ const options = {
   module: {
     rules: [
       {
+        test: /\.js$/,
+        enforce: 'pre',
+        loader: 'remove-flow-types-loader',
+      },
+      {
         test: /\.css$/,
         loader: 'style-loader!css-loader',
         exclude: /node_modules/,

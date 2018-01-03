@@ -21,8 +21,11 @@
     "webpack": "~3.10.0"
   },
   "devDependencies": {
+    "babel-eslint": "^8.1.2",
     "eslint": "^4.13.1",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0"
+    "eslint-plugin-flowtype": "^2.40.1",
+    "eslint-plugin-import": "^2.8.0",
+    "remove-flow-types-loader": "^1.1.0"
   }
 }
