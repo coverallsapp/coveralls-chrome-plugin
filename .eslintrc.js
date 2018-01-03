@@ -6,6 +6,7 @@ module.exports = {
     'class-methods-use-this': 'off',
     'no-new': 'off',
     'no-underscore-dangle': 'off',
+    'no-plusplus': 'off',
   },
   env: {
     browser: 'true'

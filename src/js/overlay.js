@@ -6,15 +6,39 @@ import optionsHelper from './optionsHelper';
 import '../css/badges.css';
 
 function getSha() {
-  return $('.commit-tease-sha').length ? $('.commit-tease-sha').attr('href').split('/').pop() : null;
+  let sha = null;
+  if ($('.commit-tease-sha').length) {
+    sha = $('.commit-tease-sha').attr('href').split('/').pop();
+  } else if ($('.sha.user-select-contain')) {
+    sha = $('.sha.user-select-contain')[0].innerText;
+  }
+
+  return sha;
 }
 
 function loadFileCoverage(filepath, coverage) {
   const path = window.location.pathname.split('/');
 
-  if (path.length === 2) { // master branch file list
-  } else if (path[3] === 'tree') { // Showing a folder view
-  } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
+  if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
+    console.log(filepath);
+    $(`.diff-view:contains(${filepath})`).each(function addCoverageInfoToFileInMultifile() {
+      if ($(this).find('.file-info .link-gray-dark')[0].innerText === filepath) {
+        const startLine = $(this).find('.blob-code-hunk')[0].innerText.replace('@@ -', '').split(',')[0];
+        const diffAnchor = $(this).find('.js-file-header')[0].dataset.anchor;
+
+        for (let i = startLine - 1; i < coverage.length; i++) {
+          const value = coverage[i];
+          const line = $(`tr:has(#${diffAnchor}R${i + 1})`).find('.blob-code-inner:last');
+
+          if (value > 0) {
+            line.append(`<span class="coveralls-text-badge coveralls-cov-darker" data-badge-text="${value}X"></span>`);
+          } else if (value === 0) {
+            line.append('<span class="coveralls-text-badge coveralls-uncov-darker" data-badge-text="uncov"></span>');
+          }
+        }
+
+      }
+    });
   } else if (['blob', 'blame'].includes(path[3])) { // View has contents of a full file
     coverage.forEach((value, index) => {
       const line = $(`#LC${index + 1}`);
