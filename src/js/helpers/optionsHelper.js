@@ -2,8 +2,8 @@ import browser from 'webextension-polyfill';
 
 const defaultOptions = {
   overlayEnabled: true,
-  gitUrl: 'github.com',
-  coverallsUrl: 'coveralls.io',
+  gitHostname: 'github.com',
+  coverallsUrl: 'https://coveralls.io',
   apiToken: '',
   gitClient: 'github',
 };
