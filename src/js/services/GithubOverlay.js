@@ -85,15 +85,18 @@ export default class GitHubOverlay implements IOverlay {
   applyPathCoverage(path: string, coverage: Object) {
     const urlPath = window.location.pathname.split('/');
     const directory = urlPath.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
-    const textForRow = path.replace('/*', '').replace(directory, '');
+    const textForRow = path.replace(directory, '').replace('/*', '');
+    console.log(directory, textForRow);
 
     if (textForRow === '*') {
-      $('.commit-tease .message').append(`<img class="coveralls-percent-badge" 
-                                             style="position: absolute" 
-                                             src="${coverage.badge_url}">`);
+      $('.commit-tease .float-right').prepend(`<img class="coveralls-percent-badge" 
+                                             style="position: absolute; right: 225px;" 
+                                             src="https://s3.amazonaws.com/assets.coveralls.io/badges/coveralls_${Math.round(coverage.paths_covered_percent)}.svg">`);
     } else {
       $(`tr.js-navigation-item:contains(${textForRow})`).each(function addCoverageInformation() {
-        $(this).find('td:last').prepend(`<img class="coveralls-percent-badge" src="${coverage.badge_url}">`);
+        if ($(this).find('.content .js-navigation-open')[0].innerText === textForRow) {
+          $(this).find('td:last').prepend(`<img class="coveralls-percent-badge" src="https://s3.amazonaws.com/assets.coveralls.io/badges/coveralls_${Math.round(coverage.paths_covered_percent)}.svg">`);
+        }
       });
     }
   }

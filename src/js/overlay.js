@@ -16,7 +16,7 @@ function gitClientOverlay(gitClient) {
 
 optionsHelper.getOptions().then((options) => {
   function processPage() {
-    if (options.overlayEnabled && window.location.hostname === options.gitUrl) {
+    if (options.overlayEnabled && window.location.hostname === options.gitHostname) {
       const connection = browser.runtime.connect();
       const overlay = gitClientOverlay(options.gitClient);
 
