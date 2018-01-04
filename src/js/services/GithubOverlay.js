@@ -89,9 +89,10 @@ export default class GitHubOverlay implements IOverlay {
     console.log(directory, textForRow);
 
     if (textForRow === '*') {
-      $('.commit-tease .float-right').prepend(`<img class="coveralls-percent-badge" 
-                                             style="position: absolute; right: 225px;" 
-                                             src="https://s3.amazonaws.com/assets.coveralls.io/badges/coveralls_${Math.round(coverage.paths_covered_percent)}.svg">`);
+      const commitTease = $('.commit-tease .float-right');
+      commitTease.prepend(`<img class="coveralls-percent-badge" 
+                                style="position: absolute; right: ${commitTease.width() + 10}px;" 
+                                src="https://s3.amazonaws.com/assets.coveralls.io/badges/coveralls_${Math.round(coverage.paths_covered_percent)}.svg">`);
     } else {
       $(`tr.js-navigation-item:contains(${textForRow})`).each(function addCoverageInformation() {
         if ($(this).find('.content .js-navigation-open')[0].innerText === textForRow) {
