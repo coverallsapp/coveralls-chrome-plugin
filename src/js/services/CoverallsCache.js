@@ -5,6 +5,7 @@ import optionsHelper from '../helpers/optionsHelper';
 export default class CoverallsCache {
   constructor(commitSha) {
     this.commitSha = commitSha;
+    this._clearExpiredCache();
     optionsHelper.getOptions().then((options) => {
       this.$http = axios.create({
         baseURL: `${options.coverallsUrl}/builds`,
@@ -60,11 +61,24 @@ export default class CoverallsCache {
   }
 
   async _cacheCommitObj() {
+    const date = new Date();
     const cacheObj = {};
-    console.log(this.commitObj);
+    this.commitObj.expirationDate = date.setDate(date.getDate() + 7);
     cacheObj[this.commitSha] = this.commitObj;
 
     return browser.storage.local.set(cacheObj);
+  }
+
+  async _clearExpiredCache() {
+    const allCached = await browser.storage.local.get();
+    const date = new Date();
+    Object.keys(allCached).forEach(async (cacheKey) => {
+      if (allCached[cacheKey].expirationDate < date) {
+        const reset = {};
+        reset[cacheKey] = null;
+        await browser.storage.local.set(reset);
+      }
+    });
   }
 }
 
