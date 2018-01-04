@@ -5,4 +5,5 @@ export interface IOverlay {
   filesAndPathsForLoading(): ?Object,
   applyFileCoverage(filepath: string, coverage: Array<number>): void,
   applyPathCoverage(path: string, coverage: Object): void,
+  resetOverlay(): void,
 }

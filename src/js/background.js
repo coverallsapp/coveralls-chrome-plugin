@@ -3,11 +3,12 @@ import browser from 'webextension-polyfill';
 import optionsHelper from './helpers/optionsHelper';
 import CoverallsCache from './services/CoverallsCache';
 
+let openPort = false;
+
 const pageListener = async (port) => {
   let currentSha = null;
   let currentCache = null;
-
-  port.postMessage('getCommitSha');
+  openPort = port;
 
   // Functions used for handling messages requesting data from the content script
   const processInitialCommitLoad = (message) => {
@@ -47,11 +48,25 @@ const pageListener = async (port) => {
   };
   port.onMessage.addListener(messageHandler);
 
-
   // Manually disconnect listeners when tab closes
   port.onDisconnect.addListener((p) => {
     p.onMessage.removeListener(messageHandler);
+    openPort = false;
   });
 };
 browser.runtime.onConnect.addListener(pageListener);
+
+
+const onBrowserAction = async () => {
+  const options = await optionsHelper.getOptions();
+
+  options.overlayEnabled = !options.overlayEnabled;
+  optionsHelper.saveOptions(options);
+
+  if (openPort) {
+    openPort.postMessage(options.overlayEnabled ? 'enableOverlay' : 'disableOverlay');
+  }
+};
+browser.browserAction.onClicked.addListener(onBrowserAction);
+
 

@@ -16,15 +16,21 @@ function gitClientOverlay(gitClient) {
 
 optionsHelper.getOptions().then((options) => {
   function processPage() {
-    if (options.overlayEnabled && window.location.hostname === options.gitHostname) {
+    if (window.location.hostname === options.gitHostname) {
       const connection = browser.runtime.connect();
       const overlay = gitClientOverlay(options.gitClient);
 
+      if (options.overlayEnabled) {
+        connection.postMessage({ sha: overlay.sha });
+      }
+
       connection.onMessage.addListener((message) => {
-        if (message === 'getCommitSha') {
-          connection.postMessage({ sha: overlay.sha });
-        } else if (message === 'sendFilesForLoading') {
+        if (message === 'sendFilesForLoading') {
           connection.postMessage(overlay.filesAndPathsForLoading());
+        } else if (message === 'disableOverlay') {
+          overlay.resetOverlay();
+        } else if (message === 'enableOverlay') {
+          connection.postMessage({ sha: overlay.sha });
         } else if (message.file) {
           overlay.applyFileCoverage(message.file, message.coverage);
         } else if (message.path && _.get(message.coverage, 'paths_covered_percent')) {
