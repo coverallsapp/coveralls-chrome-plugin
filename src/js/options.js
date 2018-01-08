@@ -3,7 +3,6 @@ import '../css/options.css';
 
 async function setupOptions() {
   const options = await optionsHelper.getOptions();
-  document.getElementById('overlay-enabled').checked = options.overlayEnabled;
   document.getElementById('git-hostname').value = options.gitHostname;
   document.getElementById('coveralls-url').value = options.coverallsUrl;
   document.getElementById('api-token').value = options.apiToken;
@@ -18,7 +17,6 @@ async function saveOptions() {
 
   const options = {
     gitHostname: document.getElementById('git-hostname').value,
-    overlayEnabled: document.getElementById('overlay-enabled').checked,
     coverallsUrl: document.getElementById('coveralls-url').value,
     apiToken: document.getElementById('api-token').value,
   };
