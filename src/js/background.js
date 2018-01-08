@@ -1,5 +1,14 @@
 import browser from 'webextension-polyfill';
 
+import '../images/icon-16.png';
+import '../images/icon-32.png';
+import '../images/icon-48.png';
+import '../images/icon-128.png';
+import '../images/icon-16-deactivated.png';
+import '../images/icon-32-deactivated.png';
+import '../images/icon-48-deactivated.png';
+import '../images/icon-128-deactivated.png';
+
 import optionsHelper from './helpers/optionsHelper';
 import CoverallsCache from './services/CoverallsCache';
 
@@ -59,8 +68,25 @@ browser.runtime.onConnect.addListener(pageListener);
 
 const onBrowserAction = async () => {
   const options = await optionsHelper.getOptions();
+  const deactivatedIcons = {
+    path: {
+      16: 'icon-16-deactivated.png',
+      32: 'icon-32-deactivated.png',
+      48: 'icon-48-deactivated.png',
+      128: 'icon-128-deactivated.png',
+    },
+  };
+  const activatedIcons = {
+    path: {
+      16: 'icon-16.png',
+      32: 'icon-32.png',
+      48: 'icon-48.png',
+      128: 'icon-128.png',
+    },
+  };
 
   options.overlayEnabled = !options.overlayEnabled;
+  browser.browserAction.setIcon(options.overlayEnabled ? activatedIcons : deactivatedIcons);
   optionsHelper.saveOptions(options);
 
   if (openPort) {
