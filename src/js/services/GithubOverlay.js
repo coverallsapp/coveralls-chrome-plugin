@@ -1,6 +1,7 @@
 // @flow
 import * as $ from 'jquery';
 import type { IOverlay } from './OverlayInterface';
+import overlayHelper from '../helpers/overlayHelper';
 
 export default class GitHubOverlay implements IOverlay {
   sha: ?string
@@ -86,17 +87,19 @@ export default class GitHubOverlay implements IOverlay {
     const urlPath = window.location.pathname.split('/');
     const directory = urlPath.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
     const textForRow = path.replace(directory, '').replace('/*', '');
-    console.log(directory, textForRow);
 
     if (textForRow === '*') {
       const commitTease = $('.commit-tease .float-right');
-      commitTease.prepend(`<img class="coveralls coveralls-percent-badge" 
-                                style="position: absolute; right: ${commitTease.width() + 10}px;" 
-                                src="https://s3.amazonaws.com/assets.coveralls.io/badges/coveralls_${Math.round(coverage.paths_covered_percent)}.svg">`);
+      commitTease.prepend(`<span class="coveralls coveralls-percent-badge" 
+                                 style="position: absolute; right: ${commitTease.width() + 10}px;">
+                             ${overlayHelper.svgBadge(Math.round(coverage.paths_covered_percent))}
+                           </span>`);
     } else {
       $(`tr.js-navigation-item:contains(${textForRow})`).each(function addCoverageInformation() {
         if ($(this).find('.content .js-navigation-open')[0].innerText === textForRow) {
-          $(this).find('td:last').prepend(`<img class="coveralls coveralls-percent-badge" src="https://s3.amazonaws.com/assets.coveralls.io/badges/coveralls_${Math.round(coverage.paths_covered_percent)}.svg">`);
+          $(this).find('td:last').prepend(`<span class="coveralls coveralls-percent-badge">
+                                             ${overlayHelper.svgBadge(Math.round(coverage.paths_covered_percent))}
+                                           </span>`);
         }
       });
     }
@@ -112,7 +115,7 @@ export default class GitHubOverlay implements IOverlay {
     let sha: ?string;
     if ($('.commit-tease-sha').length) {
       sha = $('.commit-tease-sha').attr('href').split('/').pop();
-    } else if ($('.sha.user-select-contain')) {
+    } else if ($('.sha.user-select-contain').length) {
       sha = $('.sha.user-select-contain')[0].innerText;
     }
 
