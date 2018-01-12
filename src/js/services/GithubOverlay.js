@@ -87,7 +87,6 @@ export default class GitHubOverlay implements IOverlay {
     const urlPath = window.location.pathname.split('/');
     const directory = urlPath.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
     const textForRow = path.replace(directory, '').replace('/*', '');
-    console.log(directory, textForRow);
 
     if (textForRow === '*') {
       const commitTease = $('.commit-tease .float-right');
@@ -116,7 +115,7 @@ export default class GitHubOverlay implements IOverlay {
     let sha: ?string;
     if ($('.commit-tease-sha').length) {
       sha = $('.commit-tease-sha').attr('href').split('/').pop();
-    } else if ($('.sha.user-select-contain')) {
+    } else if ($('.sha.user-select-contain').length) {
       sha = $('.sha.user-select-contain')[0].innerText;
     }
 
