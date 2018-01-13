@@ -31,9 +31,10 @@
 }
 
 .coveralls-percent-badge {
-  padding-right: 10px;
-  width: 120px;
+  width: 100px;
   height: 20px;
-  padding-left: 10px;
 }
 
+td.coveralls-table-column {
+  width: 100px;
+}

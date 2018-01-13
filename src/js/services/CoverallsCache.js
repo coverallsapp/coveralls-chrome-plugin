@@ -20,10 +20,15 @@ export default class CoverallsCache {
     }
 
     if (!this.commitObj.files[filepath]) {
-      const result = await this.$http.get(`${this.commitSha}/source.json`, {
-        params: { filename: filepath },
-      });
-      this.commitObj.files[filepath] = result.data;
+      try {
+        const result = await this.$http.get(`${this.commitSha}/source.json`, {
+          params: { filename: filepath },
+        });
+        this.commitObj.files[filepath] = result.data;
+      } catch (error) {
+        this.commitObj.files[filepath] = {};
+      }
+
       this._cacheCommitObj();
     }
 
@@ -47,7 +52,7 @@ export default class CoverallsCache {
   }
 
   async _getSavedBuild() {
-    this.commitObj = await browser.storage.local.get(this.commitSha)[this.commitSha];
+    this.commitObj = (await browser.storage.local.get(this.commitSha))[this.commitSha];
 
     if (!(this.commitObj && Object.keys(this.commitObj).length)) {
       const result = await this.$http.get(`${this.commitSha}.json`);
@@ -73,7 +78,8 @@ export default class CoverallsCache {
     const allCached = await browser.storage.local.get();
     const date = new Date();
     Object.keys(allCached).forEach(async (cacheKey) => {
-      if (allCached[cacheKey].expirationDate < date) {
+      if (allCached[cacheKey] && allCached[cacheKey].expirationDate < date) {
+        console.log('here');
         const reset = {};
         reset[cacheKey] = null;
         await browser.storage.local.set(reset);
