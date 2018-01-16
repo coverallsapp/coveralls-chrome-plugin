@@ -28,7 +28,13 @@ export default class GitHubOverlay implements IOverlay {
           overlay.filesAndPaths.loading.paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}`);
         }
 
-        $(this).find('td:last').after('<td class="coveralls coveralls-table-column"></td>');
+        const commitTease = $('.commit-tease .float-right');
+        commitTease.prepend(`<span class="coveralls coveralls-percent-badge" 
+                                   style="position: absolute; right: ${commitTease.width() + 20}px;">
+                               ${overlayHelper.svgBadge()}
+                             </span>`);
+
+        $(this).find('td:last').before('<td class="coveralls coveralls-table-column"></td>');
       });
     } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
       this.filesAndPaths.loading.files = [];
@@ -123,17 +129,14 @@ export default class GitHubOverlay implements IOverlay {
       const textForRow = path.replace(directory, '').replace('/*', '');
 
       if (textForRow === '*') {
-        const commitTease = $('.commit-tease .float-right');
-        commitTease.prepend(`<span class="coveralls coveralls-percent-badge" 
-                                 style="position: absolute; right: ${commitTease.width() + 20}px;">
-                             ${overlayHelper.svgBadge(Math.round(coverage.paths_covered_percent))}
-                           </span>`);
+        const commitTease = $('.commit-tease .float-right .coveralls');
+        commitTease.html(`${overlayHelper.svgBadge(Math.round(coverage.paths_covered_percent))}`);
       } else {
         $(`tr.js-navigation-item:contains(${textForRow})`).each(function addCoverageInformation() {
           if ($(this).find('.content .js-navigation-open')[0].innerText === textForRow) {
             $(this).find('td.coveralls').html(`<span class="coveralls coveralls-percent-badge">
-                                               ${overlayHelper.svgBadge(Math.round(coverage.paths_covered_percent))}
-                                             </span>`);
+                                                 ${overlayHelper.svgBadge(Math.round(coverage.paths_covered_percent))}
+                                               </span>`);
           }
         });
       }
