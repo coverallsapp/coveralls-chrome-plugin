@@ -32,9 +32,9 @@ optionsHelper.getOptions().then((options) => {
         } else if (message === 'enableOverlay') {
           connection.postMessage({ sha: overlay.sha });
         } else if (message.file) {
-          overlay.applyFileCoverage(message.file, message.coverage);
-        } else if (message.path && _.get(message.coverage, 'paths_covered_percent')) {
-          overlay.applyPathCoverage(message.path, message.coverage);
+          overlay.loadedFileCoverage(message.file, message.coverage);
+        } else if (message.path && _.has(message.coverage, 'paths_covered_percent')) {
+          overlay.loadedPathCoverage(message.path, message.coverage);
         }
       });
     }

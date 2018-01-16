@@ -5,49 +5,80 @@ import overlayHelper from '../helpers/overlayHelper';
 
 export default class GitHubOverlay implements IOverlay {
   sha: ?string
+  filesAndPaths: Object
   constructor() {
     this.sha = this._getSha();
+    this._resetFilesAndPaths();
   }
 
   filesAndPathsForLoading() {
+    this._resetFilesAndPaths();
+
     const path = window.location.pathname.split('/');
+    const overlay = this;
 
     if (path.length === 3 || path[3] === 'tree') { // Showing a folder view
       const directory = path.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
-      const paths = [`${directory}*`];
+      this.filesAndPaths.loading.paths = [`${directory}*`];
 
       $('tr.js-navigation-item').each(function addToFilenames() {
         if ($(this).find('.icon .octicon-file-directory').length) {
-          paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}/*`);
+          overlay.filesAndPaths.loading.paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}/*`);
         } else if ($(this).find('.icon .octicon-file').length) {
-          paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}`);
+          overlay.filesAndPaths.loading.paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}`);
         }
 
         $(this).find('td:last').after('<td class="coveralls coveralls-table-column"></td>');
       });
-
-      return {
-        paths,
-      };
     } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
-      const filenames = [];
-      $('.file-info .link-gray-dark').each(function addToFileNames() {
-        filenames.push(this.innerText);
-      });
+      this.filesAndPaths.loading.files = [];
 
-      return {
-        files: filenames,
-      };
+      $('.file-info .link-gray-dark').each(function addToFileNames() {
+        overlay.filesAndPaths.loading.files.push(this.innerText);
+      });
     } else if (['blob', 'blame'].includes(path[3])) { // View has contents of a full file
-      return {
-        files: [$('.breadcrumb')[0].innerText.split('/').splice(1).join('/')],
-      };
+      this.filesAndPaths.loading.files = [$('.breadcrumb')[0].innerText.split('/').splice(1).join('/')];
     }
 
-    return null;
+    return this.filesAndPaths.loading;
   }
 
-  applyFileCoverage(filepath: string, coverage: Array<number>) {
+  loadedFileCoverage(filepath: string, coverage: Array<number>) {
+    const loadingIndex = this.filesAndPaths.loading.files.indexOf(filepath);
+    if (loadingIndex !== -1) {
+      this.filesAndPaths.loaded.files.push({ filepath, coverage });
+      this.filesAndPaths.loading.files.splice(loadingIndex, 1);
+    }
+
+    if (this._allCoverageGathered()) {
+      this._applyCoverageVisuals();
+    }
+  }
+
+  loadedPathCoverage(path: string, coverage: Object) {
+    const loadingIndex = this.filesAndPaths.loading.paths.indexOf(path);
+    if (loadingIndex !== -1) {
+      this.filesAndPaths.loaded.paths.push({ path, coverage });
+      this.filesAndPaths.loading.paths.splice(loadingIndex, 1);
+    }
+
+    if (this._allCoverageGathered()) {
+      this._applyCoverageVisuals();
+    }
+  }
+
+  _applyCoverageVisuals() {
+    this.filesAndPaths.loaded.files.forEach((file) => {
+      this._applyFileCoverage(file.filepath, file.coverage);
+    });
+    this.filesAndPaths.loaded.paths.forEach((path) => {
+      this._applyPathCoverage(path.path, path.coverage);
+    });
+
+    this._resetFilesAndPaths();
+  }
+
+  _applyFileCoverage(filepath: string, coverage: Array<number>) {
     const path = window.location.pathname.split('/');
 
     if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
@@ -85,25 +116,27 @@ export default class GitHubOverlay implements IOverlay {
     }
   }
 
-  applyPathCoverage(path: string, coverage: Object) {
-    const urlPath = window.location.pathname.split('/');
-    const directory = urlPath.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
-    const textForRow = path.replace(directory, '').replace('/*', '');
+  _applyPathCoverage(path: string, coverage: Object) {
+    if (coverage.paths_covered_percent != null) {
+      const urlPath = window.location.pathname.split('/');
+      const directory = urlPath.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
+      const textForRow = path.replace(directory, '').replace('/*', '');
 
-    if (textForRow === '*') {
-      const commitTease = $('.commit-tease .float-right');
-      commitTease.prepend(`<span class="coveralls coveralls-percent-badge" 
+      if (textForRow === '*') {
+        const commitTease = $('.commit-tease .float-right');
+        commitTease.prepend(`<span class="coveralls coveralls-percent-badge" 
                                  style="position: absolute; right: ${commitTease.width() + 20}px;">
                              ${overlayHelper.svgBadge(Math.round(coverage.paths_covered_percent))}
                            </span>`);
-    } else {
-      $(`tr.js-navigation-item:contains(${textForRow})`).each(function addCoverageInformation() {
-        if ($(this).find('.content .js-navigation-open')[0].innerText === textForRow) {
-          $(this).find('td.coveralls').html(`<span class="coveralls coveralls-percent-badge">
+      } else {
+        $(`tr.js-navigation-item:contains(${textForRow})`).each(function addCoverageInformation() {
+          if ($(this).find('.content .js-navigation-open')[0].innerText === textForRow) {
+            $(this).find('td.coveralls').html(`<span class="coveralls coveralls-percent-badge">
                                                ${overlayHelper.svgBadge(Math.round(coverage.paths_covered_percent))}
                                              </span>`);
-        }
-      });
+          }
+        });
+      }
     }
   }
 
@@ -122,5 +155,22 @@ export default class GitHubOverlay implements IOverlay {
     }
 
     return sha;
+  }
+
+  _resetFilesAndPaths() {
+    this.filesAndPaths = {
+      loading: {
+        files: [],
+        paths: [],
+      },
+      loaded: {
+        files: [],
+        paths: [],
+      },
+    };
+  }
+
+  _allCoverageGathered() {
+    return (this.filesAndPaths.loading.files.length === 0 && this.filesAndPaths.loading.paths.length === 0);
   }
 }

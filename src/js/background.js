@@ -46,13 +46,14 @@ optionsHelper.getOptions().then((options) => {
     // Message handler, identify message type call correct function defined above
     const messageHandler = (message) => {
       console.log(message);
-      if (message && message.sha) {
+      if (message.sha) {
         processInitialCommitLoad(message);
       }
 
-      if (message && message.files) {
+      if (message.files && message.files.length) {
         message.files.forEach(processFileRequest);
-      } else if (message && message.paths) {
+      } else if (message.paths && message.paths.length) {
+        console.log(message.paths);
         message.paths.forEach(processPathRequest);
       }
     };

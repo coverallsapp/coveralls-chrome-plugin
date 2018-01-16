@@ -41,10 +41,15 @@ export default class CoverallsCache {
     }
 
     if (!this.commitObj.paths[path]) {
-      const result = await this.$http.get(`${this.commitSha}.json`, {
-        params: { paths: path },
-      });
-      this.commitObj.paths[path] = result.data;
+      try {
+        const result = await this.$http.get(`${this.commitSha}.json`, {
+          params: { paths: path },
+        });
+        this.commitObj.paths[path] = result.data;
+      } catch (error) {
+        this.commitObj.paths[path] = {};
+      }
+
       this._cacheCommitObj();
     }
 
