@@ -31,17 +31,13 @@
 }
 
 .coveralls-percent-badge {
-  display: inline-flex;
-  align-self: center;
-  position: relative;
-  width: 100px;
-  height: 1em;
+  display: inline-block;
   margin: 0px 3px;
 }
 
 .coveralls-percent-badge svg {
-  bottom: -0.35em;
-  position: absolute;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .coveralls-spinner {

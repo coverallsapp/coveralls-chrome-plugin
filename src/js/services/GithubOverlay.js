@@ -31,11 +31,7 @@ export default class GitHubOverlay implements IOverlay {
         $(this).find('td:last').before('<td class="coveralls coveralls-table-column"></td>');
       });
 
-      const commitTease = $('.commit-tease .float-right');
-      commitTease.prepend(`<span class="coveralls coveralls-percent-badge">
-                               ${overlayHelper.svgBadge()}
-                             </span>`);
-      $('.commit-tease .Details .message');
+      $(overlayHelper.coverallsBadge()).hide().prependTo('.commit-tease .float-right').fadeIn('slow');
     } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
       this.filesAndPaths.loading.files = [];
 
@@ -130,13 +126,15 @@ export default class GitHubOverlay implements IOverlay {
 
       if (textForRow === '*') {
         const commitTease = $('.commit-tease .float-right .coveralls');
-        commitTease.html(`${overlayHelper.svgBadge(coverage.paths_covered_percent)}`);
+        commitTease.fadeOut('slow', function setFullCoverage() {
+          $(this).html(`${overlayHelper.coverallsBadge(coverage.paths_covered_percent)}`);
+        }).fadeIn('slow');
       } else if (coverage.paths_covered_percent != null) {
         $(`tr.js-navigation-item:contains(${textForRow})`).each(function addCoverageInformation() {
           if ($(this).find('.content .js-navigation-open')[0].innerText === textForRow) {
-            $(this).find('td.coveralls').html(`<span class="coveralls coveralls-percent-badge">
-                                                 ${overlayHelper.svgBadge(coverage.paths_covered_percent)}
-                                               </span>`);
+            $(this).find('td.coveralls').fadeOut('slow', function setPathCoverage() {
+              $(this).html(`${overlayHelper.coverallsBadge(coverage.paths_covered_percent)}`);
+            }).fadeIn('slow');
           }
         });
       }
