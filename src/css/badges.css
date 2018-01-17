@@ -31,8 +31,17 @@
 }
 
 .coveralls-percent-badge {
+  display: inline-flex;
+  align-self: center;
+  position: relative;
   width: 100px;
-  height: 20px;
+  height: 1em;
+  margin: 0px 3px;
+}
+
+.coveralls-percent-badge svg {
+  bottom: -0.35em;
+  position: absolute;
 }
 
 .coveralls-spinner {
@@ -43,7 +52,6 @@
   height: 15px;
   animation: coveralls-spin 0.5s linear infinite;
 }
-
 
 @keyframes coveralls-spin {
   0% { transform: rotate(0deg); }

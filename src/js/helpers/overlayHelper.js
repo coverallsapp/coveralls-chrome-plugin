@@ -1,19 +1,19 @@
 function fillColor(percentage) {
-  if (percentage < 80) {
+  if (percentage == null) {
+    return '#bbb';
+  } else if (percentage < 80) {
     return '#e05d44';
   } else if (percentage < 90) {
     return '#dfb317';
-  } else if (percentage != null) {
-    return '#97CA00';
   }
 
-  return '#bbb';
+  return '#97CA00';
 }
 
 function svgPercentageLabel(percentage) {
-  if (percentage != null) {
-    return `<text x="80" y="15" fill="#010101" fill-opacity=".3">${percentage}%</text>
-            <text x="80" y="14">${percentage}%</text>`;
+  if (percentage !== undefined) {
+    return `<text x="80" y="15" fill="#010101" fill-opacity=".3">${Math.round(percentage)}%</text>
+            <text x="80" y="14">${Math.round(percentage)}%</text>`;
   }
 
   return `<circle cx="72" cy="10" r="3">
