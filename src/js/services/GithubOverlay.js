@@ -1,5 +1,4 @@
 // @flow
-import 'arrive';
 import * as $ from 'jquery';
 import type { IOverlay } from './OverlayInterface';
 import overlayHelper from '../helpers/overlayHelper';
