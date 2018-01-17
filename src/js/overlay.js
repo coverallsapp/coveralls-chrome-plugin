@@ -41,6 +41,6 @@ optionsHelper.getOptions().then((options) => {
   }
 
   processPage();
-  document.addEventListener('pjax:success', processPage);
+  document.addEventListener('pjax:complete', processPage);
 });
 
