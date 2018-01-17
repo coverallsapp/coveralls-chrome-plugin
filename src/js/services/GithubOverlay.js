@@ -94,9 +94,11 @@ export default class GitHubOverlay implements IOverlay {
             const line = $(`tr:has(#${diffAnchor}R${i + 1})`).find('.blob-code-inner:last');
 
             if (value > 0) {
-              line.append(`<span class="coveralls coveralls-text-badge coveralls-cov-darker" data-badge-text="${value}X"></span>`);
+              const html = `<span class="coveralls coveralls-text-badge coveralls-cov-darker" data-badge-text="${value}X"></span>`;
+              $(html).hide().appendTo(line).fadeIn('slow');
             } else if (value === 0) {
-              line.append('<span class="coveralls coveralls-text-badge coveralls-uncov-darker" data-badge-text="uncov"></span>');
+              const html = '<span class="coveralls coveralls-text-badge coveralls-uncov-darker" data-badge-text="uncov"></span>';
+              $(html).hide().appendTo(line).fadeIn('slow');
             }
           }
         }
@@ -108,11 +110,15 @@ export default class GitHubOverlay implements IOverlay {
         if (value > 0) {
           line.addClass('coveralls-cov');
           lineNum.addClass('coveralls-cov');
-          line.append(`<span class="coveralls coveralls-text-badge coveralls-cov-darker" data-badge-text="${value}X"></span>`);
+
+          const html = `<span class="coveralls coveralls-text-badge coveralls-cov-darker" data-badge-text="${value}X"></span>`;
+          $(html).hide().appendTo(line).fadeIn('slow');
         } else if (value === 0) {
           line.addClass('coveralls-uncov');
           lineNum.addClass('coveralls-uncov');
-          line.append('<span class="coveralls coveralls-text-badge coveralls-uncov-darker" data-badge-text="uncov"></span>');
+
+          const html = '<span class="coveralls coveralls-text-badge coveralls-uncov-darker" data-badge-text="uncov"></span>';
+          $(html).hide().appendTo(line).fadeIn('slow');
         }
       });
     }
