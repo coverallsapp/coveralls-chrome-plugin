@@ -1,4 +1,5 @@
 // @flow
+import 'arrive';
 import * as $ from 'jquery';
 import type { IOverlay } from './OverlayInterface';
 import overlayHelper from '../helpers/overlayHelper';
@@ -6,8 +7,10 @@ import overlayHelper from '../helpers/overlayHelper';
 export default class GitHubOverlay implements IOverlay {
   sha: ?string
   filesAndPaths: Object
-  constructor() {
-    this.sha = this._getSha();
+  shaChangeCallback: (string) => void
+  constructor(shaChangeCallback: (string) => void) {
+    this.shaChangeCallback = shaChangeCallback;
+    this._watchForSha();
     this._resetFilesAndPaths();
   }
 
@@ -15,7 +18,7 @@ export default class GitHubOverlay implements IOverlay {
     this._resetFilesAndPaths();
 
     const path = window.location.pathname.split('/');
-    const overlay = this;
+    const self = this;
 
     if (path.length === 3 || path[3] === 'tree') { // Showing a folder view
       const directory = path.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
@@ -23,9 +26,9 @@ export default class GitHubOverlay implements IOverlay {
 
       $('tr.js-navigation-item').each(function addToFilenames() {
         if ($(this).find('.icon .octicon-file-directory').length) {
-          overlay.filesAndPaths.loading.paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}/*`);
+          self.filesAndPaths.loading.paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}/*`);
         } else if ($(this).find('.icon .octicon-file').length) {
-          overlay.filesAndPaths.loading.paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}`);
+          self.filesAndPaths.loading.paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}`);
         }
 
         $(this).find('td:last').before('<td class="coveralls coveralls-table-column"></td>');
@@ -36,7 +39,7 @@ export default class GitHubOverlay implements IOverlay {
       this.filesAndPaths.loading.files = [];
 
       $('.file-info .link-gray-dark').each(function addToFileNames() {
-        overlay.filesAndPaths.loading.files.push(this.innerText);
+        self.filesAndPaths.loading.files.push(this.innerText);
       });
     } else if (['blob', 'blame'].includes(path[3])) { // View has contents of a full file
       this.filesAndPaths.loading.files = [$('.breadcrumb')[0].innerText.split('/').splice(1).join('/')];
@@ -153,15 +156,18 @@ export default class GitHubOverlay implements IOverlay {
     $('.coveralls-cov').removeClass('coveralls-cov');
   }
 
-  _getSha(): ?string {
-    let sha: ?string;
+  _watchForSha() {
     if ($('.commit-tease-sha').length) {
-      sha = $('.commit-tease-sha').attr('href').split('/').pop();
+      this.sha = $('.commit-tease-sha').attr('href').split('/').pop();
     } else if ($('.sha.user-select-contain').length) {
-      sha = $('.sha.user-select-contain')[0].innerText;
+      this.sha = $('.sha.user-select-contain')[0].innerText;
     }
 
-    return sha;
+    if (this.sha) {
+      this.shaChangeCallback(this.sha);
+    } else {
+      setTimeout(() => { this._watchForSha(); }, 500);
+    }
   }
 
   _resetFilesAndPaths() {

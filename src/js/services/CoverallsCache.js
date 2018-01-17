@@ -4,7 +4,7 @@ import optionsHelper from '../helpers/optionsHelper';
 
 export default class CoverallsCache {
   constructor(commitSha) {
-    this.commitSha = commitSha;
+    this.commitSha = `${commitSha}`;
     this._clearExpiredCache();
     optionsHelper.getOptions().then((options) => {
       this.$http = axios.create({

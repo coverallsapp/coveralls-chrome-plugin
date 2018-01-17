@@ -24,12 +24,12 @@
 
 .coveralls-uncov-darker {
   background-color: rgba(185, 73, 71, 0.7);
-  transition: all 0.6s ease;
+  transition: background-color 0.6s;
 }
 
 .coveralls-cov-darker {
   background-color: rgba(95, 151, 68, 0.7);
-  transition: all 0.6s ease;
+  transition: background-color 0.6s;
 }
 
 .coveralls-percent-badge {

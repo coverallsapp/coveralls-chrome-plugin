@@ -5,9 +5,9 @@ import optionsHelper from './helpers/optionsHelper';
 import GithubOverlay from './services/GithubOverlay';
 import '../css/badges.css';
 
-function gitClientOverlay(gitClient) {
+function gitClientOverlay(gitClient, shaCallback) {
   if (gitClient === 'github') {
-    return new GithubOverlay();
+    return new GithubOverlay(shaCallback);
   }
 
   return null;
@@ -18,11 +18,11 @@ optionsHelper.getOptions().then((options) => {
   function processPage() {
     if (window.location.hostname === options.gitHostname) {
       const connection = browser.runtime.connect();
-      const overlay = gitClientOverlay(options.gitClient);
-
-      if (options.overlayEnabled) {
-        connection.postMessage({ sha: overlay.sha });
-      }
+      const overlay = gitClientOverlay(options.gitClient, (sha) => {
+        if (options.overlayEnabled) {
+          connection.postMessage({ sha });
+        }
+      });
 
       connection.onMessage.addListener((message) => {
         if (message === 'sendFilesForLoading') {
