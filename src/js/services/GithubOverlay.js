@@ -85,6 +85,10 @@ export default class GitHubOverlay implements IOverlay {
   _applyFileCoverage(filepath: string, coverage: Array<number>) {
     const path = window.location.pathname.split('/');
 
+    if (!coverage.length) {
+      return;
+    }
+
     if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
       $(`.diff-view:contains(${filepath})`).each(function addCoverageInfoToFileInMultifile() {
         if ($(this).find('.file-info .link-gray-dark')[0].innerText === filepath) {
@@ -127,6 +131,12 @@ export default class GitHubOverlay implements IOverlay {
   }
 
   _applyPathCoverage(path: string, coverage: Object) {
+    if (!Object.keys(coverage).length){
+      const commitTease = $('.commit-tease .float-right .coveralls');
+      commitTease.fadeOut('slow');
+      return;
+    }
+
     if (coverage.paths_covered_percent !== undefined) {
       const urlPath = window.location.pathname.split('/');
       const directory = urlPath.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');

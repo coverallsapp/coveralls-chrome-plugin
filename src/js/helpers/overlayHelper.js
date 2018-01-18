@@ -39,7 +39,7 @@ function svgLoading() {
                  begin="0s" dur="0.8s" 
                  values=".5;1;.5" 
                  calcMode="linear" 
-                 epeatCount="indefinite"/>
+                 repeatCount="indefinite"/>
       </circle>
       <circle cx="105" cy="15" r="12">
         <animate attributeName="r" 

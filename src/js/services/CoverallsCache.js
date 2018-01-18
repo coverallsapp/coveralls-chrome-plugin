@@ -26,7 +26,7 @@ export default class CoverallsCache {
         });
         this.commitObj.files[filepath] = result.data;
       } catch (error) {
-        this.commitObj.files[filepath] = {};
+        this.commitObj.files[filepath] = [];
       }
 
       this._cacheCommitObj();
@@ -60,8 +60,13 @@ export default class CoverallsCache {
     this.commitObj = (await browser.storage.local.get(this.commitSha))[this.commitSha];
 
     if (!(this.commitObj && Object.keys(this.commitObj).length)) {
-      const result = await this.$http.get(`${this.commitSha}.json`);
-      this.commitObj = result.data;
+      try {
+        const result = await this.$http.get(`${this.commitSha}.json`);
+        this.commitObj = result.data;
+      } catch (error) {
+        this.commitObj = {};
+      }
+
       this.commitObj.files = {};
       this.commitObj.paths = {};
       this._cacheCommitObj();

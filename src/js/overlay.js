@@ -25,6 +25,7 @@ optionsHelper.getOptions().then((options) => {
       });
 
       connection.onMessage.addListener((message) => {
+        console.log(message);
         if (message === 'sendFilesForLoading') {
           connection.postMessage(overlay.filesAndPathsForLoading());
         } else if (message === 'disableOverlay') {
@@ -33,7 +34,7 @@ optionsHelper.getOptions().then((options) => {
           connection.postMessage({ sha: overlay.sha });
         } else if (message.file) {
           overlay.loadedFileCoverage(message.file, message.coverage);
-        } else if (message.path && _.has(message.coverage, 'paths_covered_percent')) {
+        } else if (message.path) {
           overlay.loadedPathCoverage(message.path, message.coverage);
         }
       });
