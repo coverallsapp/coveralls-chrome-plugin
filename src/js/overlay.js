@@ -19,13 +19,12 @@ optionsHelper.getOptions().then((options) => {
     if (window.location.hostname === options.gitHostname) {
       const connection = browser.runtime.connect();
       const overlay = gitClientOverlay(options.gitClient, (sha) => {
-        if (options.overlayEnabled) {
+        if (options.overlayEnabled && connection) {
           connection.postMessage({ sha });
         }
       });
 
       connection.onMessage.addListener((message) => {
-        console.log(message);
         if (message === 'sendFilesForLoading') {
           connection.postMessage(overlay.filesAndPathsForLoading());
         } else if (message === 'disableOverlay') {

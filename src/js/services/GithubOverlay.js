@@ -33,7 +33,9 @@ export default class GitHubOverlay implements IOverlay {
         $(this).find('td:last').before('<td class="coveralls coveralls-table-column"></td>');
       });
 
-      $(overlayHelper.coverallsBadge()).hide().prependTo('.commit-tease .float-right').fadeIn('slow');
+      if (!$('.commit-tease .float-right .coveralls').length) {
+        $(overlayHelper.coverallsBadge()).hide().prependTo('.commit-tease .float-right').fadeIn('slow');
+      }
     } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
       this.filesAndPaths.loading.files = [];
 
@@ -165,7 +167,7 @@ export default class GitHubOverlay implements IOverlay {
     $('.coveralls-cov').removeClass('coveralls-cov');
   }
 
-  _watchForSha() {
+  _watchForSha(runs: number = 0) {
     if ($('.commit-tease-sha').length) {
       this.sha = $('.commit-tease-sha').attr('href').split('/').pop();
     } else if ($('.sha.user-select-contain').length) {
@@ -174,8 +176,8 @@ export default class GitHubOverlay implements IOverlay {
 
     if (this.sha) {
       this.shaChangeCallback(this.sha);
-    } else {
-      setTimeout(() => { this._watchForSha(); }, 500);
+    } else if (runs < 10) {
+      setTimeout(() => { this._watchForSha(runs + 1); }, 500);
     }
   }
 
