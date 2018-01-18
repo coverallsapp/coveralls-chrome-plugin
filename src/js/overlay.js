@@ -13,19 +13,36 @@ function gitClientOverlay(gitClient, shaCallback) {
   return null;
 }
 
-
 optionsHelper.getOptions().then((options) => {
   function processPage() {
     if (window.location.hostname === options.gitHostname) {
       const connection = browser.runtime.connect();
-      const overlay = gitClientOverlay(options.gitClient, (sha) => {
-        if (options.overlayEnabled) {
-          connection.postMessage({ sha });
+      const overlay = gitClientOverlay(options.gitClient);
+      const initialUrl = window.location.href;
+
+      const observer = new MutationObserver((mutations, self) => {
+        if (initialUrl !== window.location.href) {
+          self.disconnect();
+        }
+
+        if (overlay.checkSha()) {
+          connection.postMessage({ sha: overlay.sha });
+          self.disconnect();
         }
       });
 
+      if (overlay.checkSha()) {
+        connection.postMessage({ sha: overlay.sha });
+      } else {
+        observer.observe(document, {
+          attributes: true,
+          characterData: true,
+          childList: true,
+          subtree: true,
+        });
+      }
+
       connection.onMessage.addListener((message) => {
-        console.log(message);
         if (message === 'sendFilesForLoading') {
           connection.postMessage(overlay.filesAndPathsForLoading());
         } else if (message === 'disableOverlay') {
