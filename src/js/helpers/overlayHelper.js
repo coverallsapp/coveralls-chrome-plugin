@@ -92,8 +92,6 @@ function coverallsBadge(percentage) {
     </span>`;
 }
 
-
-
 export default {
   coverallsBadge,
   svgLoading,

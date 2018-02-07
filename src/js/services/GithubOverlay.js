@@ -6,11 +6,18 @@ import overlayHelper from '../helpers/overlayHelper';
 export default class GitHubOverlay implements IOverlay {
   sha: ?string
   filesAndPaths: Object
-  shaChangeCallback: (string) => void
-  constructor(shaChangeCallback: (string) => void) {
-    this.shaChangeCallback = shaChangeCallback;
-    this._watchForSha();
+  constructor() {
     this._resetFilesAndPaths();
+  }
+
+  checkSha(): boolean {
+    if ($('.commit-tease-sha').length) {
+      this.sha = $('.commit-tease-sha').attr('href').split('/').pop();
+    } else if ($('.sha.user-select-contain').length) {
+      this.sha = $('.sha.user-select-contain')[0].innerText;
+    }
+
+    return !!this.sha;
   }
 
   filesAndPathsForLoading() {
@@ -20,17 +27,17 @@ export default class GitHubOverlay implements IOverlay {
     const self = this;
 
     if (path.length === 3 || path[3] === 'tree') { // Showing a folder view
-      const directory = path.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
+      const directory = path.length === 2 ? '' : this._directoryFromBreadcrumb();
       this.filesAndPaths.loading.paths = [`${directory}*`];
 
       $('tr.js-navigation-item').each(function addToFilenames() {
         if ($(this).find('.icon .octicon-file-directory').length) {
-          self.filesAndPaths.loading.paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}/*`);
+          const filename = $(this).find('.content .js-navigation-open')[0].outerText;
+          self.filesAndPaths.loading.paths.push(`${directory}${filename}/*`);
         } else if ($(this).find('.icon .octicon-file').length) {
-          self.filesAndPaths.loading.paths.push(`${directory}${$(this).find('.content .js-navigation-open')[0].outerText}`);
+          const filename = $(this).find('.content .js-navigation-open')[0].outerText;
+          self.filesAndPaths.loading.paths.push(`${directory}${filename}`);
         }
-
-        $(this).find('td:last').before('<td class="coveralls coveralls-table-column"></td>');
       });
 
       $(overlayHelper.coverallsBadge()).hide().prependTo('.commit-tease .float-right').fadeIn('slow');
@@ -41,7 +48,9 @@ export default class GitHubOverlay implements IOverlay {
         self.filesAndPaths.loading.files.push(this.innerText);
       });
     } else if (['blob', 'blame'].includes(path[3])) { // View has contents of a full file
-      this.filesAndPaths.loading.files = [$('.breadcrumb')[0].innerText.split('/').splice(1).join('/')];
+      this.filesAndPaths.loading.files = [
+        this._directoryFromBreadcrumb(),
+      ];
     }
 
     return this.filesAndPaths.loading;
@@ -71,7 +80,16 @@ export default class GitHubOverlay implements IOverlay {
     }
   }
 
+  resetOverlay() {
+    $('.coveralls').remove();
+    $('.coveralls-uncov').removeClass('coveralls-uncov');
+    $('.coveralls-cov').removeClass('coveralls-cov');
+  }
+
+  // PRIVATE
+
   _applyCoverageVisuals() {
+    this._addCoverageColumn();
     this.filesAndPaths.loaded.files.forEach((file) => {
       this._applyFileCoverage(file.filepath, file.coverage);
     });
@@ -92,7 +110,10 @@ export default class GitHubOverlay implements IOverlay {
     if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
       $(`.diff-view:contains(${filepath})`).each(function addCoverageInfoToFileInMultifile() {
         if ($(this).find('.file-info .link-gray-dark')[0].innerText === filepath) {
-          const startLine = $(this).find('.blob-code-hunk')[0].innerText.replace('@@ -', '').split(',')[0];
+          const startLine = $(this).find('.blob-code-hunk')[0]
+            .innerText
+            .replace('@@ -', '')
+            .split(',')[0];
           const diffAnchor = $(this).find('.js-file-header')[0].dataset.anchor;
 
           for (let i = startLine - 1; i < coverage.length; i++) {
@@ -100,10 +121,12 @@ export default class GitHubOverlay implements IOverlay {
             const line = $(`tr:has(#${diffAnchor}R${i + 1})`).find('.blob-code-inner:last');
 
             if (value > 0) {
-              const html = `<span class="coveralls coveralls-text-badge coveralls-cov-darker" data-badge-text="${value}X"></span>`;
+              const html = `<span class="coveralls coveralls-text-badge coveralls-cov-darker" 
+                                  data-badge-text="${value}X"></span>`;
               $(html).hide().appendTo(line).fadeIn('slow');
             } else if (value === 0) {
-              const html = '<span class="coveralls coveralls-text-badge coveralls-uncov-darker" data-badge-text="uncov"></span>';
+              const html = `<span class="coveralls coveralls-text-badge coveralls-uncov-darker" 
+                                  data-badge-text="uncov"></span>`;
               $(html).hide().appendTo(line).fadeIn('slow');
             }
           }
@@ -117,13 +140,15 @@ export default class GitHubOverlay implements IOverlay {
           line.addClass('coveralls-cov');
           lineNum.addClass('coveralls-cov');
 
-          const html = `<span class="coveralls coveralls-text-badge coveralls-cov-darker" data-badge-text="${value}X"></span>`;
+          const html = `<span class="coveralls coveralls-text-badge coveralls-cov-darker" 
+                              data-badge-text="${value}X"></span>`;
           $(html).hide().appendTo(line).fadeIn('slow');
         } else if (value === 0) {
           line.addClass('coveralls-uncov');
           lineNum.addClass('coveralls-uncov');
 
-          const html = '<span class="coveralls coveralls-text-badge coveralls-uncov-darker" data-badge-text="uncov"></span>';
+          const html = `<span class="coveralls coveralls-text-badge coveralls-uncov-darker" 
+                              data-badge-text="uncov"></span>`;
           $(html).hide().appendTo(line).fadeIn('slow');
         }
       });
@@ -131,7 +156,7 @@ export default class GitHubOverlay implements IOverlay {
   }
 
   _applyPathCoverage(path: string, coverage: Object) {
-    if (!Object.keys(coverage).length){
+    if (!Object.keys(coverage).length) {
       const commitTease = $('.commit-tease .float-right .coveralls');
       commitTease.fadeOut('slow');
       return;
@@ -139,7 +164,7 @@ export default class GitHubOverlay implements IOverlay {
 
     if (coverage.paths_covered_percent !== undefined) {
       const urlPath = window.location.pathname.split('/');
-      const directory = urlPath.length === 2 ? '' : $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
+      const directory = urlPath.length === 2 ? '' : this._directoryFromBreadcrumb();
       const textForRow = path.replace(directory, '').replace('/*', '');
 
       if (textForRow === '*') {
@@ -159,26 +184,6 @@ export default class GitHubOverlay implements IOverlay {
     }
   }
 
-  resetOverlay() {
-    $('.coveralls').remove();
-    $('.coveralls-uncov').removeClass('coveralls-uncov');
-    $('.coveralls-cov').removeClass('coveralls-cov');
-  }
-
-  _watchForSha() {
-    if ($('.commit-tease-sha').length) {
-      this.sha = $('.commit-tease-sha').attr('href').split('/').pop();
-    } else if ($('.sha.user-select-contain').length) {
-      this.sha = $('.sha.user-select-contain')[0].innerText;
-    }
-
-    if (this.sha) {
-      this.shaChangeCallback(this.sha);
-    } else {
-      setTimeout(() => { this._watchForSha(); }, 500);
-    }
-  }
-
   _resetFilesAndPaths() {
     this.filesAndPaths = {
       loading: {
@@ -193,6 +198,19 @@ export default class GitHubOverlay implements IOverlay {
   }
 
   _allCoverageGathered() {
-    return (this.filesAndPaths.loading.files.length === 0 && this.filesAndPaths.loading.paths.length === 0);
+    return (this.filesAndPaths.loading.files.length === 0 &&
+      this.filesAndPaths.loading.paths.length === 0);
+  }
+
+  _directoryFromBreadcrumb(): string {
+    return $('.breadcrumb')[0].innerText.split('/').splice(1).join('/');
+  }
+
+  _addCoverageColumn() {
+    $('tr.js-navigation-item').each(function addCoverageColumn() {
+      if (!$(this).find('.coverage-table-column').length) {
+        $(this).find('td:last').before('<td class="coveralls coveralls-table-column"></td>');
+      }
+    });
   }
 }
