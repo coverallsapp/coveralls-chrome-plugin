@@ -6,6 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const fileExtensions = ['jpg', 'jpeg', 'png', 'gif', 'eot', 'otf', 'svg', 'ttf', 'woff', 'woff2'];
 
+// This comment exists only in production, DO NOT MERGE BRANCH INTO MASTER
 const options = {
   entry: {
     options: path.join(__dirname, 'src', 'js', 'options.js'),
