@@ -40,7 +40,9 @@ export default class GitHubOverlay implements IOverlay {
         }
       });
 
-      $(overlayHelper.coverallsBadge()).hide().prependTo('.commit-tease .float-right').fadeIn('slow');
+      if (!$('.commit-tease .float-right .coveralls').length) {
+        $(overlayHelper.coverallsBadge()).hide().prependTo('.commit-tease .float-right').fadeIn('slow');
+      }
     } else if (['commit', 'pull'].includes(path[3])) { // View has contents of multiple files
       this.filesAndPaths.loading.files = [];
 
