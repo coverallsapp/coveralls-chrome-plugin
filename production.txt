@@ -1,3 +1,0 @@
-This file exists only in production.
-
-If you see this as a change, you are merging production code into master. Do not continue.
