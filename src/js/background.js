@@ -53,7 +53,6 @@ optionsHelper.getOptions().then((options) => {
       if (message.files && message.files.length) {
         message.files.forEach(processFileRequest);
       } else if (message.paths && message.paths.length) {
-        console.log(message.paths);
         message.paths.forEach(processPathRequest);
       }
     };

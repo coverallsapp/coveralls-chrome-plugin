@@ -25,11 +25,11 @@ export default class CoverallsCache {
           params: { filename: filepath },
         });
         this.commitObj.files[filepath] = result.data;
+
+        this._cacheCommitObj();
       } catch (error) {
         this.commitObj.files[filepath] = [];
       }
-
-      this._cacheCommitObj();
     }
 
     return this.commitObj.files[filepath];
@@ -46,11 +46,11 @@ export default class CoverallsCache {
           params: { paths: path },
         });
         this.commitObj.paths[path] = result.data;
+
+        this._cacheCommitObj();
       } catch (error) {
         this.commitObj.paths[path] = {};
       }
-
-      this._cacheCommitObj();
     }
 
     return this.commitObj.paths[path];

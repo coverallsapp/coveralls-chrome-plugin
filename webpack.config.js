@@ -2,7 +2,6 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const FlowWebpackPlugin = require('flow-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const fileExtensions = ['jpg', 'jpeg', 'png', 'gif', 'eot', 'otf', 'svg', 'ttf', 'woff', 'woff2'];
 
@@ -35,8 +34,7 @@ const options = {
       },
       {
         test: /\.html$/,
-        loader: 'html-loader',
-        exclude: /node_modules/,
+        loader: 'file-loader?name=[name].[ext]!extract-loader!html-loader',
       },
     ],
   },
@@ -55,11 +53,6 @@ const options = {
       ),
     }]),
     new FlowWebpackPlugin(),
-    new HtmlWebpackPlugin({
-      template: path.join(__dirname, 'src', 'options.html'),
-      filename: 'options.html',
-      chunks: ['options'],
-    }),
   ],
 };
 
