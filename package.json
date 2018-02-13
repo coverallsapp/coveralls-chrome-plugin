@@ -3,7 +3,8 @@
   "version": "0.0.2",
   "description": "Coveralls extension to integrate with git client and display code coverage",
   "scripts": {
-    "build": "./node_modules/.bin/webpack"
+    "build": "./node_modules/.bin/webpack",
+    "deploy": "npm run build && node webstore-uploader.js -f 'dist/*' -z dist/release.zip"
   },
   "dependencies": {
     "axios": "^0.17.1",
