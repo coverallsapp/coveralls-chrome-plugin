@@ -4,10 +4,11 @@
   "description": "Coveralls extension to integrate with git client and display code coverage",
   "scripts": {
     "build": "./node_modules/.bin/webpack",
-    "deploy": "npm run build && node webstore-uploader.js -f 'dist/*' -z dist/release.zip"
+    "deploy": "npm run build && node deploy-script.js -f 'dist/*' -z dist/release.zip"
   },
   "dependencies": {
     "axios": "^0.17.1",
+    "chrome-webstore-upload": "^0.2.1",
     "clean-webpack-plugin": "^0.1.17",
     "copy-webpack-plugin": "^4.3.0",
     "css-loader": "~0.28.7",
