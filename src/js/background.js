@@ -45,7 +45,6 @@ optionsHelper.getOptions().then((options) => {
 
     // Message handler, identify message type call correct function defined above
     const messageHandler = (message) => {
-      console.log(message);
       if (message.sha) {
         processInitialCommitLoad(message);
       }
