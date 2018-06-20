@@ -1,6 +1,6 @@
 {
   "name": "Coveralls",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Coveralls extension to integrate with git client and display code coverage",
   "scripts": {
     "build": "./node_modules/.bin/webpack",
