@@ -1,5 +1,4 @@
 import browser from 'webextension-polyfill';
-import * as _ from 'lodash';
 
 import optionsHelper from './helpers/optionsHelper';
 import GithubOverlay from './services/GithubOverlay';
