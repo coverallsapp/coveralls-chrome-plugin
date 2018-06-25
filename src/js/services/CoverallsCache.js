@@ -19,7 +19,7 @@ export default class CoverallsCache {
       await this._getSavedBuild();
     }
 
-    if (!this.commitObj.files[filepath]) {
+    if (!this.commitObj.files[filepath] || !Array.isArray(this.commitObj.files[filepath])) {
       try {
         const result = await this.$http.get(`${this.commitSha}/source.json`, {
           params: { filename: filepath },
@@ -40,7 +40,7 @@ export default class CoverallsCache {
       await this._getSavedBuild();
     }
 
-    if (!this.commitObj.paths[path]) {
+    if (!this.commitObj.paths[path] || typeof this.commitObj.paths[path] === 'string') {
       try {
         const result = await this.$http.get(`${this.commitSha}.json`, {
           params: { paths: path },
